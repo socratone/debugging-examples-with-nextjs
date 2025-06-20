@@ -1,1 +1,1 @@
-# Debugging with Next.js
+# Debugging Examples With Next.js
