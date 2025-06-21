@@ -13,7 +13,7 @@ const Page = () => {
   }, []);
 
   return (
-    <div className="p-8 flex flex-col items-center justify-center gap-2">
+    <>
       <p>모바일에서 브라우저 콘솔을 확인할 수 있다.</p>
       <div>
         <button
@@ -31,7 +31,7 @@ const Page = () => {
           네트워크 요청
         </button>
       </div>
-    </div>
+    </>
   );
 };
 
