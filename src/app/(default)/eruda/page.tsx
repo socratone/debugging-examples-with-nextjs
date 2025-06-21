@@ -1,5 +1,7 @@
 'use client';
 
+import PrimaryButton from '@/components/atom/PrimaryButton';
+import SecondaryButton from '@/components/atom/SecondaryButton';
 import { useEffect } from 'react';
 
 const Page = () => {
@@ -16,20 +18,16 @@ const Page = () => {
     <>
       <p>모바일에서 브라우저 콘솔을 확인할 수 있다.</p>
       <div>
-        <button
-          onClick={() => console.log('clicked!')}
-          className="px-4 py-2 border bg-blue-400 font-bold text-white rounded cursor-pointer "
-        >
+        <PrimaryButton onClick={() => console.log('clicked!')}>
           콘솔 로그
-        </button>
+        </PrimaryButton>
       </div>
       <div>
-        <button
+        <SecondaryButton
           onClick={() => fetch('https://jsonplaceholder.typicode.com/posts')}
-          className="px-4 py-2 border bg-purple-400 font-bold text-white rounded cursor-pointer "
         >
           네트워크 요청
-        </button>
+        </SecondaryButton>
       </div>
     </>
   );
