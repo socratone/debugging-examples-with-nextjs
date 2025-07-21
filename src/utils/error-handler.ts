@@ -2,6 +2,7 @@ import logger from '../lib/logger';
 import fs from 'fs';
 import path from 'path';
 import { JSX } from 'react';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * 서버 사이드 에러를 Winston으로 로깅하는 유틸리티 함수들
@@ -106,6 +107,47 @@ export function withServerComponentErrorLogging<
 
       // 에러 페이지를 보여주기 위해 다시 throw
       throw error;
+    }
+  }) as T;
+}
+
+/**
+ * API 라우트를 래핑하여 에러 발생 시 자동으로 로깅하고 적절한 에러 응답을 반환하는 함수
+ * @param handler - 래핑할 API 라우트 핸들러 함수
+ * @param routeName - 라우트 이름 (로깅용)
+ * @param context - 추가 컨텍스트 정보
+ */
+export function withApiRouteErrorLogging<
+  T extends (request: NextRequest, ...args: any[]) => Promise<NextResponse>
+>(handler: T, routeName: string, context?: Record<string, any>): T {
+  return (async (request: NextRequest, ...args: Parameters<T>) => {
+    try {
+      return await handler(request, ...args);
+    } catch (error) {
+      ensureLogDirectory();
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      logger.error('API route error', {
+        message: errorMessage,
+        stack: errorStack,
+        timestamp: new Date().toISOString(),
+        routeName,
+        method: request.method,
+        url: request.url,
+        userAgent: request.headers.get('user-agent'),
+        ...context,
+      });
+
+      // 클라이언트에게 적절한 에러 응답 반환
+      return NextResponse.json(
+        {
+          error: 'Internal Server Error',
+          message: process.env.NODE_ENV === 'development' ? errorMessage : 'Something went wrong',
+        },
+        { status: 500 }
+      );
     }
   }) as T;
 }
